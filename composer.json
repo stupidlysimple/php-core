@@ -10,9 +10,6 @@
         "homepage": "https://www.studionexus.co",
         "role": "Developer"
     }],
-    "config": {
-        "vendor-dir": "vendor"
-    },
     "require": {
         "php": ">=5.4.0"
     },
