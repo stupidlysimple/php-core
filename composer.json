@@ -1,0 +1,24 @@
+{
+    "name": "damnstupidsimple/core",
+    "description": "The core package for Damn Stupid Simple framework",
+    "keywords": ["micro framework","lazy","damn stupid simple"],
+    "license": "MIT",
+    "type": "project",
+    "authors": [{
+        "name": "Studio Nexus",
+        "email": "fariz@studionexus.co",
+        "homepage": "https://www.studionexus.co",
+        "role": "Developer"
+    }],
+    "config": {
+        "vendor-dir": "vendor"
+    },
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Core\\": "src"
+        }
+    }
+}
