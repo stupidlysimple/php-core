@@ -32,53 +32,78 @@
 namespace Core;
 
 /**
- *  The Sharer
+ * The Configuration Loader
  * -----------------------------------------------------------------------
  *
- * Sharer are also used for dependency injection (see Core\App). Sharer
- * is used to import variables directly into the current symbol table from 
- * the array. It is also used for dependency injection to the template 
- * files.
+ * The Configuration loader are responsible to read and return the
+ * configurations in a form of array.
  *
- * Simply use extract(Core\Sharer::get()); to import the variables.
+ * Usage:
+ * 1. Get the entire configuration from a file:
+ * 	  $config = Config::get('filename');
  *
- * @see Core\Sharer::share(), Core\Sharer::get(), Core\App::link()
+ * 2. Get specific configuration from a file:
+ *    $config = Config::get('filename', 'configuration_key');
+ *
  */
-class Sharer {
+class Config {
+
 	/**
-	 * The array of objects / variables. The array key is the variable name,
-	 * while the array values are references to objects / variables.
-	 *
-	 * @var object
-	 * @access private
+	 * The array of configuration from config/env.php
+	 * @var array
+	 * @access protected
 	 * @static
 	 */
-	static public $store = null;
-	
+	protected static $env = null;
+
 	/**
-	 * Stores references to variable or object to the static $store
+	 * The array of configuration from files located on config directory
+	 * @var array
+	 * @access protected
+	 * @static
+	 */
+	protected static $hive = null;
+
+	/**
+	 * Link a variable or an object to the container
 	 *
-	 * @param string	$key 		the variable name
-	 * @param mixed		&$value	reference to variable / object
+	 * @param string	$file 	the configuration file name (without .php)
+	 * @param string	$key	the array key
+	 *
+	 * @return array	$hive	the array of configurations
 	 *
 	 * @static
 	 * @access public
-	 * @since Method available since Release 0.1.0
+	 * @since Method available since 0.1.1
 	 */
-	static function share($key, &$value){
-		self::$store[$key] = &$value;
+	public static function get($file, $key = null){
+		if(isset(self::$hive[$file]) === false){
+			self::$hive[$file] = include_once(DSS_PATH.'config/'.$file.'.php');
+		}
+
+		if($key === null){
+			return self::$hive[$file];
+		}else{
+			return self::$hive[$file][$key];
+		}
 	}
-	
+
 	/**
-	 * Get data stored into $store
-	 *
-	 * @return array	$store	the array of data
+	 * Reads the configuration file (config/env.php) and include each of the
+	 * variables (retrieved in a form of associative array) to the Environment
+	 * Variable. Also store the configurations into static variable $env
 	 *
 	 * @static
 	 * @access public
-	 * @since Method available since Release 0.1.0
+	 * @since Method available since Release 0.1.1
 	 */
-	static function get(){
-		return self::$store;
+	public static function setEnv(){
+		if(self::$env === null){
+			self::$env = require_once(DSS_PATH.'config/env.php');
+		}
+
+		foreach(self::$env as $v => $a){
+			putenv($v.'='.$a);
+		}
 	}
 }

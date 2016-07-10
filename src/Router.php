@@ -29,7 +29,7 @@
  * @copyright 	2015 Noah Buscher
  * @license 	https://github.com/noahbuscher/Macaw/blob/master/LICENSE.md MIT
  * @link 		https://github.com/noahbuscher/Macaw
- * @version		Release: 0.1.0
+ * @version		Release: 0.1.1
  */
 namespace Core;
 
@@ -138,7 +138,7 @@ class Router {
               // Fix multi parameters
               if(!method_exists($controller, $segments[1])) {
                 //"controller and action not found"
-								Debugger::report(500);
+				Debugger::report(500);
               } else {
                 call_user_func_array(array($controller, $segments[1]), $matched);
               }

@@ -26,7 +26,7 @@
  * @author		Studio Nexus <fariz@studionexus.co>
  * @copyright	2016 Studio Nexus
  * @license		MIT
- * @version		Release: 0.1.0
+ * @version		Release: 0.1.1
  * @link		https://www.studionexus.co/php/damnstupidsimple
  */
 namespace Core;
@@ -73,7 +73,7 @@ class Cache {
 	static function init(){
 		
 		if(self::$config === null){
-			self::$config = require_once(DSS_PATH.'config/cache.php');
+			self::$config = Config::get('cache');
 		}
 		
 		if(self::$config['enabled'] === true){

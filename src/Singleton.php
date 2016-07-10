@@ -32,53 +32,57 @@
 namespace Core;
 
 /**
- *  The Sharer
+ * The Singleton
  * -----------------------------------------------------------------------
  *
- * Sharer are also used for dependency injection (see Core\App). Sharer
- * is used to import variables directly into the current symbol table from 
- * the array. It is also used for dependency injection to the template 
- * files.
+ * Simply extends this Singleton class if you wish to use the Singleton
+ * pattern of programming in your project
  *
- * Simply use extract(Core\Sharer::get()); to import the variables.
- *
- * @see Core\Sharer::share(), Core\Sharer::get(), Core\App::link()
  */
-class Sharer {
+class Singleton {
+	private static $instances = array();
+
 	/**
-	 * The array of objects / variables. The array key is the variable name,
-	 * while the array values are references to objects / variables.
+	 * Constructor method
 	 *
-	 * @var object
-	 * @access private
-	 * @static
+	 * @access protected
+	 * @since Method available since Release 0.1.1
 	 */
-	static public $store = null;
-	
-	/**
-	 * Stores references to variable or object to the static $store
-	 *
-	 * @param string	$key 		the variable name
-	 * @param mixed		&$value	reference to variable / object
-	 *
-	 * @static
-	 * @access public
-	 * @since Method available since Release 0.1.0
-	 */
-	static function share($key, &$value){
-		self::$store[$key] = &$value;
+	protected function __construct() {
+		//
 	}
-	
+
 	/**
-	 * Get data stored into $store
+	 * Avoid cloning
 	 *
-	 * @return array	$store	the array of data
-	 *
-	 * @static
-	 * @access public
-	 * @since Method available since Release 0.1.0
+	 * @access protected
+	 * @since Method available since Release 0.1.1
 	 */
-	static function get(){
-		return self::$store;
+	protected function __clone() {
+		//
+	}
+
+	/**
+	 * Avoid unserialization
+	 *
+	 * @access public
+	 * @since Method available since Release 0.1.1
+	 */
+	public function __wakeup(){
+		throw new Exception("Cannot unserialize singleton");
+	}
+
+	/**
+	 * Get the instance of desired class
+	 *
+	 * @access public
+	 * @since Method available since Release 0.1.1
+	 */
+	public static function getInstance(){
+		$class = get_called_class(); // late-static-bound class name
+		if (!isset(self::$instances[$class])) {
+			self::$instances[$class] = new static;
+		}
+		return self::$instances[$class];
 	}
 }

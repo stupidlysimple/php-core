@@ -149,22 +149,6 @@ class Debugger {
 		self::set_header('500', 'Internal Server Error');
 		include('errorpage/'. $name .'.php');
 	}
-
-	/**
-	 * Reads the configuration file (config/env.php) and and include each of the
-	 * variables (retrieved in a form of associative array) to the Environment
-	 * Variable.
-	 *
-	 * @static
-	 * @access public
-	 * @since Method available since Release 0.1.0
-	 */
-	static function init_env(){
-		$var=require_once(DSS_PATH.'config/env.php');
-		foreach($var as $v => $a){
-			putenv($v.'='.$a);	
-		}
-	}
 	
 	/**
 	 * Calculate a precise time difference.

@@ -26,7 +26,7 @@
  * @author		Studio Nexus <fariz@studionexus.co>
  * @copyright	2016 Studio Nexus
  * @license		MIT
- * @version		Release: 0.1.0
+ * @version		Release: 0.1.1
  * @link		https://www.studionexus.co/php/damnstupidsimple
  */
 namespace Core;
@@ -55,10 +55,10 @@ class Database extends Capsule{
 	 * @access public
 	 * @since Method available since Release 0.1.0
 	 */
-	static function connect(){
+	public static function connect(){
 		
 		if(self::$config === null){
-			self::$config = include(DSS_PATH.'config/database.php');
+			self::$config = Config::get('database');
 		}
 			
 		if(self::$config['enabled'] === true){
