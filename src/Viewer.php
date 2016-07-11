@@ -26,7 +26,7 @@
  * @author		Studio Nexus <fariz@studionexus.co>
  * @copyright	2016 Studio Nexus
  * @license		MIT
- * @version		Release: 0.1.1
+ * @version		Release: 0.2.0
  * @link		https://www.studionexus.co/php/damnstupidsimple
  */
 namespace Core;
