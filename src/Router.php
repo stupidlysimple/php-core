@@ -26,24 +26,19 @@
  * @author		Studio Nexus <fariz@studionexus.co>
  * @copyright	2016 Studio Nexus
  * @license		MIT
- * @version		Release: 0.2.0
+ * @version		Release: 0.3.0
  * @link		https://www.studionexus.co/php/damnstupidsimple
  */
 namespace Core;
 
-/**
- * Routing System
- * -----------------------------------------------------------------------
- *
- * @method static Macaw get(string $route, Callable $callback)
- * @method static Macaw post(string $route, Callable $callback)
- * @method static Macaw put(string $route, Callable $callback)
- * @method static Macaw delete(string $route, Callable $callback)
- * @method static Macaw options(string $route, Callable $callback)
- * @method static Macaw head(string $route, Callable $callback)
- *
- */
 class Router {
+	/**
+	 * The configurations
+	 * @var array
+	 * @access private
+	 * @static
+    */
+  static private $config = null;
   public static $halts = false;
   public static $routes = array();
   public static $methods = array();
@@ -64,6 +59,20 @@ class Router {
     array_push(self::$methods, strtoupper($method));
     array_push(self::$callbacks, $callback);
   }
+
+  /**
+   * Load the configuration file
+   */
+  public static function start(){
+	if(self::$config === null){
+		self::$config = Config::get('routes');
+	}
+
+    foreach(self::$config['routes'] as $route){
+        include(self::$config['path'] . $route . '.php');
+    }
+  }
+
   /**
    * Defines callback if route is not found
   */
@@ -83,7 +92,7 @@ class Router {
     $searches = array_keys(static::$patterns);
     $replaces = array_values(static::$patterns);
     $found_route = false;
-		
+
     self::$routes = str_replace('//', '/', self::$routes);
     // Check if route is defined without regex
     if (in_array($uri, self::$routes)) {
@@ -136,7 +145,7 @@ class Router {
               // Fix multi parameters
               if(!method_exists($controller, $segments[1])) {
                 //"controller and action not found"
-				Debugger::report(500);
+								Debugger::report(500);
               } else {
                 call_user_func_array(array($controller, $segments[1]), $matched);
               }
@@ -145,7 +154,9 @@ class Router {
               call_user_func_array(self::$callbacks[$pos], $matched);
               if (self::$halts) return;
             }
-          }
+          }else{
+
+					}
         }
         $pos++;
       }
@@ -167,7 +178,7 @@ class Router {
       call_user_func(self::$error_callback);
     }
   }
-	
+
 	static function redirect($url, $permanent = false){
 		if (headers_sent() === false){
 			header('Location: ' . $url, true, ($permanent === true) ? 301 : 302);

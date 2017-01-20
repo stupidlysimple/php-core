@@ -87,15 +87,4 @@ class Cache {
 		}
 	}
 	
-	/**
-	 * Clear all cached data
-	 *
-	 * @static
-	 * @access public
-	 * @since Method available since Release 0.1.0
-	 */
-	static function clean(){
-		CacheManager::clean();
-	}
-	
 }

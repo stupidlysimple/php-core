@@ -40,9 +40,13 @@ namespace Core;
  *
  */
 class Debugger {
-	/**
+    private static $profiles = [];
+    private static $time_start = 0;
+    private static $profilerStartTime = 0;
+
+ 	/**
 	 * Registering the debugger to log exceptions locally or transfer them to 
-	 * external services
+	 * external services.
 	 * 
 	 * Depends on the settings in config/env.php:
 	 *
@@ -163,7 +167,7 @@ class Debugger {
 	 * @access public
 	 * @since Method available since Release 0.1.0
 	 */
-	static function microtime_diff($start)
+	static private function microtime_diff($start)
 	{
 		$duration = microtime(true) - $start;
 		$hours = (int)($duration/60/60);
@@ -185,4 +189,53 @@ class Debugger {
 	static function exec_time(){
 		echo ('<span style="display: table; margin: 0 auto;">Request takes '.(self::microtime_diff(DSS_START) * 1000 ) . ' milliseconds</span>');
 	}
+
+    static function startProfiling(){
+	    if(self::$profilerStartTime == 0){
+	        self::$profilerStartTime = microtime(true);
+        }
+
+	    self::$time_start = microtime(true);
+    }
+
+	static function addProfilingData($point_name = '', $point_type = 'others'){
+	    $profileData =
+            [
+                'name' => $point_name,
+                'time' => ( self::microtime_diff(self::$time_start) * 1000 ),
+                'unit' => 'ms',
+                'type' => $point_type
+            ];
+
+        array_push(self::$profiles, $profileData);
+
+        self::$time_start = microtime(true);
+
+	    return $profileData;
+    }
+
+    static function endProfiling(){
+	    $timeIncludingAutoloader = self::microtime_diff(DSS_START) * 1000;
+        $timeProfiled = self::microtime_diff(self::$profilerStartTime) * 1000;
+	    $timeMinusAutoloader = $timeIncludingAutoloader - $timeProfiled;
+
+        $profileData =
+            [
+                'name' => 'Starting Autoloader',
+                'time' => ($timeMinusAutoloader),
+                'unit' => 'ms',
+                'type' => 'system'
+            ];
+
+        array_unshift(self::$profiles, $profileData);
+        self::$time_start = 0;
+        self::$profilerStartTime = 0;
+
+        return
+            [
+                'Total Time' => ( $timeIncludingAutoloader ),
+                'unit' => 'ms',
+                'profiles' => self::$profiles,
+            ];
+    }
 } 
