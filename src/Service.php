@@ -7,7 +7,7 @@ namespace Core;
  * input and output processing
  * @package Core
  */
-class Service {
+class Service extends Service\ServiceContainer {
     /**
      * Contains the object of instantiation of the Service class
      * @static
@@ -47,12 +47,4 @@ class Service {
            $this->$varName = new $className;
         }
     }
-
-    /**
-     * Dump function
-     */
-    public function dump(){
-        return($this);
-    }
-
 }
