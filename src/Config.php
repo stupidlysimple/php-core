@@ -1,8 +1,8 @@
 <?php
 /**
- * Damn Stupid Simple - A PHP Framework For Lazy Developers
+ * StupidlySimple Framework - A PHP Framework For Lazy Developers
  *
- * Copyright (c) 2016 Studio Nexus
+ * Copyright (c) 2017 Fariz Luqman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,12 +22,12 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * @package		Damn Stupid Simple
- * @author		Studio Nexus <fariz@studionexus.co>
- * @copyright	2016 Studio Nexus
- * @license		MIT
- * @version		Release: 0.2.0
- * @link		https://www.studionexus.co/php/damnstupidsimple
+ * @package     StupidlySimple
+ * @author      Fariz Luqman <fariz.fnb@gmail.com>
+ * @copyright   2017 Fariz Luqman
+ * @license     MIT
+ * @since       0.3.3
+ * @link        https://stupidlysimple.github.io/
  */
 namespace Core;
 
@@ -78,7 +78,7 @@ class Config {
 	 */
 	public static function get($file, $key = null){
 		if(isset(self::$hive[$file]) === false){
-			self::$hive[$file] = include_once(DSS_PATH.'config/'.$file.'.php');
+			self::$hive[$file] = include_once(SS_PATH.'config/'.$file.'.php');
 		}
 
 		if($key === null){
@@ -99,7 +99,7 @@ class Config {
 	 */
 	public static function setEnv(){
 		if(self::$env === null){
-			self::$env = require_once(DSS_PATH.'config/env.php');
+			self::$env = require_once(SS_PATH.'config/env.php');
 		}
 
 		foreach(self::$env as $v => $a){

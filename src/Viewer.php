@@ -1,8 +1,8 @@
 <?php
 /**
- * Damn Stupid Simple - A PHP Framework For Lazy Developers
+ * StupidlySimple Framework - A PHP Framework For Lazy Developers
  *
- * Copyright (c) 2016 Studio Nexus
+ * Copyright (c) 2017 Fariz Luqman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,12 +22,12 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * @package		Damn Stupid Simple
- * @author		Studio Nexus <fariz@studionexus.co>
- * @copyright	2016 Studio Nexus
- * @license		MIT
- * @version		Release: 0.3.0
- * @link		https://www.studionexus.co/php/damnstupidsimple
+ * @package     StupidlySimple
+ * @author      Fariz Luqman <fariz.fnb@gmail.com>
+ * @copyright   2017 Fariz Luqman
+ * @license     MIT
+ * @since       0.3.3
+ * @link        https://stupidlysimple.github.io/
  */
 namespace Core;
 
@@ -69,10 +69,10 @@ class Viewer {
 				self::render($callingScriptDirectory.'/'.$file, $data);
 			}else if(file_exists($callingScriptDirectory.'/'.$file.'.php')){
 				self::render($callingScriptDirectory.'/'.$file.'.php', $data);
-			}else if(file_exists(DSS_PATH.$file)){
+			}else if(file_exists(SS_PATH.$file)){
 				self::render($file, $data);
-			}else if(file_exists(DSS_PATH.$file.'.php')){
-				self::render(DSS_PATH.$file.'.php');
+			}else if(file_exists(SS_PATH.$file.'.php')){
+				self::render(SS_PATH.$file.'.php', $data);
 			}else{
 				Debugger::report(404, true);
 			}

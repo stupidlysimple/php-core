@@ -1,8 +1,8 @@
 <?php
 /**
- * Damn Stupid Simple - A PHP Framework For Lazy Developers
+ * StupidlySimple Framework - A PHP Framework For Lazy Developers
  *
- * Copyright (c) 2016 Studio Nexus
+ * Copyright (c) 2017 Fariz Luqman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,49 +22,69 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * @package		Damn Stupid Simple
- * @author		Studio Nexus <fariz@studionexus.co>
- * @copyright	2016 Studio Nexus
- * @license		MIT
- * @version		Release: 0.3.0
- * @link		https://www.studionexus.co/php/damnstupidsimple
+ * @package     StupidlySimple
+ * @author      Fariz Luqman <fariz.fnb@gmail.com>
+ * @copyright   2017 Fariz Luqman
+ * @license     MIT
+ * @since       0.3.3
+ * @link        https://stupidlysimple.github.io/
  */
 namespace Core;
 
+use Illuminate\Support\Facades\Session;
+
 class Response {
 
-	private static $_instance = null;
-	private $data = [];
+    /**
+     * Hive containing all response values
+     * @var array
+     */
+    private static $hive = [];
 
-	private function __construct(){
-		$this->data = array_merge($_GET, $_POST);
+    private static $htmlLocation;
+    private static $time;
+    private static $flashVarsTTL = 10;
+
+    /**
+     * Response constructor.
+     */
+	private function __construct()
+    {
+        if(!isset($_SESSION)){
+            session_start();
+        }
 	}
 
-	static function redirect($html_location, $time = 0){
-		if(!headers_sent())
-		{
-			header("Location:".$html_location, TRUE, 302);
-			exit;
-		}
-		exit('<meta http-equiv="refresh" content="'.$time.'; url='.$html_location.'" />');
+    /**
+     * Redirect to a location
+     * @param $htmlLocation
+     * @param int $time
+     * @return Response
+     */
+    public static function redirect($htmlLocation, $time = 0)
+    {
+        self::$htmlLocation = $htmlLocation;
+        self::$time = $time;
+        return new self;
 	}
 
-	static function get($key = null){
-		if (self::$_instance === null) {
-			self::$_instance = new self;
-		}
+    // hello?
+    public function with(array $flashVars)
+    {
+        $_SESSION['ss_flash_variables'] = $flashVars;
+    }
 
-		return self::$_instance->returnResponse($key);
-	}
-
-	function returnResponse($key = null){
-		if($key !== null){
-			if(!isset($this->data[$key])){
-				return null;
-			}
-			return $this->data[$key];
-		}else{
-			return $this->data;
-		}
-	}
+    /**
+     * We do redirect when the Response object is destroyed.
+     */
+    public function __destruct()
+    {
+        if(!headers_sent())
+        {
+            header("Location:".self::$htmlLocation, TRUE, 302);
+            exit();
+        }
+        // Something has caused our redirect not working properly. Using redirect with meta
+        exit('<meta http-equiv="refresh" content="'.self::$time.'; url='.self::$htmlLocation.'" />');
+    }
 }

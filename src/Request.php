@@ -30,61 +30,43 @@
  * @link        https://stupidlysimple.github.io/
  */
 namespace Core;
-use phpFastCache\CacheManager as CacheManager;
 
-/**
- *  The Cache Facade
- * -----------------------------------------------------------------------
- *
- * The Cache Facade configures the Cache Manager and provides access to the 
- * Cache Manager instance
- *
- */
-class Cache {
-	
-	/**
-	 * The instance of phpFastCache\CacheManager
-	 * @var object
-	 * @access private
-	 * @static
-	 */
-	static private $CacheManager = null;
-	
-	/**
-	 * The configurations
-	 * @var array
-	 * @access private
-	 * @static
-	 */
-	static private $config = null;
-	
-	/**
-	 * Create and return the instance of phpFastCache\CacheManager 
-	 *
-	 * @return object	the instance of the Cache Manager if cache enabled
-	 *								in the configuration file (config/cache.php), null
-	 *								if disabled
-	 *
-	 * @static
-	 * @see Cache::clean()
-	 * @access public
-	 * @since Method available since Release 0.1.0
-	 */
-	static function init(){
-		
-		if(self::$config === null){
-			self::$config = Config::get('cache');
+class Request {
+
+	private static $_instance = null;
+	private $data = [];
+
+	private function __construct(){
+        // merge data with get, post and files
+		$this->data = array_merge($_GET, $_POST, $_FILES);
+
+		// start session to get flash variables
+        if(!isset($_SESSION)){
+            session_start();
+        }
+        // merge data with flash variables
+		if(isset($_SESSION['ss_flash_variables'])){
+            $this->data = array_merge($_SESSION['ss_flash_variables']);
+            unset($_SESSION['ss_flash_variables']);
+        }
+	}
+
+	static function get($key = null){
+		if (self::$_instance === null) {
+			self::$_instance = new self;
 		}
-		
-		if(self::$config['enabled'] === true){
-			CacheManager::setup(self::$config['settings']);
-			if(self::$CacheManager === null){
-				self::$CacheManager = CacheManager::getInstance();
+
+		return self::$_instance->returnRequest($key);
+	}
+
+	function returnRequest($key = null){
+		if($key !== null){
+			if(!isset($this->data[$key])){
+				return null;
 			}
-			return self::$CacheManager;
+			return $this->data[$key];
 		}else{
-			return null;
+			return $this->data;
 		}
 	}
-	
 }

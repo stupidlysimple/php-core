@@ -1,8 +1,8 @@
 <?php
 /**
- * Damn Stupid Simple - A PHP Framework For Lazy Developers
+ * StupidlySimple Framework - A PHP Framework For Lazy Developers
  *
- * Copyright (c) 2016 Studio Nexus
+ * Copyright (c) 2017 Fariz Luqman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,12 +22,12 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * @package		Damn Stupid Simple
- * @author		Studio Nexus <fariz@studionexus.co>
- * @copyright	2016 Studio Nexus
- * @license		MIT
- * @version		Release: 0.2.0
- * @link		https://www.studionexus.co/php/damnstupidsimple
+ * @package     StupidlySimple
+ * @author      Fariz Luqman <fariz.fnb@gmail.com>
+ * @copyright   2017 Fariz Luqman
+ * @license     MIT
+ * @since       0.3.3
+ * @link        https://stupidlysimple.github.io/
  */
 namespace Core;
 
@@ -187,7 +187,7 @@ class Debugger {
 	 * @since Method available since Release 0.1.0
 	 */
 	static function exec_time(){
-		echo ('<span style="display: table; margin: 0 auto;">Request takes '.(self::microtime_diff(DSS_START) * 1000 ) . ' milliseconds</span>');
+		echo ('<span style="display: table; margin: 0 auto;">Request takes '.(self::microtime_diff(SS_START) * 1000 ) . ' milliseconds</span>');
 	}
 
     static function startProfiling(){
@@ -215,7 +215,7 @@ class Debugger {
     }
 
     static function endProfiling(){
-	    $timeIncludingAutoloader = self::microtime_diff(DSS_START) * 1000;
+	    $timeIncludingAutoloader = self::microtime_diff(SS_START) * 1000;
         $timeProfiled = self::microtime_diff(self::$profilerStartTime) * 1000;
 	    $timeMinusAutoloader = $timeIncludingAutoloader - $timeProfiled;
 
