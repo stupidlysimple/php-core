@@ -1,13 +1,13 @@
 {
     "name": "damnstupidsimple/core",
-    "description": "The core package for Damn Stupid Simple framework",
-    "keywords": ["micro framework","lazy","damn stupid simple"],
+    "description": "The core package for Stupidly Simple framework",
+    "keywords": ["micro framework","lazy","stupidly simple", "php framework", "php 7", "hhvm"],
     "license": "MIT",
     "type": "project",
     "authors": [{
-        "name": "Studio Nexus",
-        "email": "fariz@studionexus.co",
-        "homepage": "https://www.studionexus.co",
+        "name": "Fariz Luqman",
+        "email": "fariz.fnb@gmail.com",
+        "homepage": "https://stupidlysimple.github.io",
         "role": "Developer"
     }],
     "require": {
