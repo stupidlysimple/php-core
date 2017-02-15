@@ -1,5 +1,5 @@
 {
-    "name": "stupidlysimple/core",
+    "name": "stupidlysimple/php-core",
     "description": "The core package for Stupidly Simple framework",
     "keywords": ["micro framework","lazy","stupidly simple", "php framework", "php 7", "hhvm"],
     "license": "MIT",
