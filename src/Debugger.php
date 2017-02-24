@@ -187,7 +187,7 @@ class Debugger {
 	 * @since Method available since Release 0.1.0
 	 */
 	static function exec_time(){
-		echo ('<span style="display: table; margin: 0 auto;">Request takes '.(self::microtime_diff(SS_START) * 1000 ) . ' milliseconds</span>');
+		echo ('<span class="ss_exec_time" style="display: table; margin: 0 auto;">Request takes '.(self::microtime_diff(SS_START) * 1000 ) . ' milliseconds</span>');
 	}
 
     static function startProfiling(){

@@ -41,6 +41,8 @@ namespace Core;
  */
 class Viewer {
 
+    private static $hive;
+
 	/**
 	 * Finds, renders and displays a template file. Reports a 404 error in
 	 * case of missing files.
@@ -103,11 +105,23 @@ class Viewer {
 			extract(Sharer::get());
 		}
 
+		// Get all defined vars into $hive, which is used in callback method replace
+        self::$hive = get_defined_vars();
+
 		ob_start();
-		include_once($file);
-		$output = ob_get_contents();
+		include($file);
+		$input = ob_get_contents();
 		ob_end_clean();
-		echo ($output);
+
+        $output = preg_replace_callback('!\{\{(\w+)\}\}!', 'Viewer::replace', $input);
+
+        echo($output);
 	}
+
+    static private function replace($matches) {
+	    if(isset(self::$hive[$matches[1]])){
+	        return self::$hive[$matches[1]];
+        }
+    }
 
 }
