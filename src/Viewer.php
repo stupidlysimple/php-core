@@ -41,86 +41,78 @@ namespace Core;
  */
 class Viewer {
 
-    private static $hive;
+    private static $hive = [];
 
-	/**
-	 * Finds, renders and displays a template file. Reports a 404 error in
-	 * case of missing files.
-	 *
-	 * @param string	$file		file name / path to the file
-	 * @param array		&$data	array of references to data or objects
- 	 *
-	 * @static
-	 * @access public
-	 * @see Viewer::render()
-	 * @since Method available since Release 0.1.0
-	 */
-	static function file($file, array &$data = []){
-		// Do you love displaying blank pages?
-		if($file === 'index' || $file === 'index.php'){
-			Debugger::report(404, true);
-		}else{
-			/**
-			 * Get the path of the calling script and get it's containing Directory
-			 * to enable include() style of accessing files
-			 */
-			$callingScriptPath = debug_backtrace()[0]['file'];
-			$callingScriptDirectory = realpath(dirname($callingScriptPath));
+    /**
+     * Finds, renders and displays a template file. Reports a 404 error in
+     * case of missing files.
+     *
+     * @param string	$file		file name / path to the file
+     * @param array		$data	array of data
+     *
+     * @static
+     * @access public
+     * @see Viewer::render()
+     * @since Method available since Release 0.1.0
+     */
+    static function file($file, array $data = []){
+        // Do you love displaying blank pages?
+        if($file === 'index' || $file === 'index.php'){
+            Debugger::report(404, true);
+        }else{
+            /**
+             * Get the path of the calling script and get it's containing Directory
+             * to enable include() style of accessing files
+             */
+            $callingScriptPath = debug_backtrace()[0]['file'];
+            $callingScriptDirectory = realpath(dirname($callingScriptPath));
+            if(file_exists($callingScriptDirectory.'/'.$file)){
+                self::render($callingScriptDirectory.'/'.$file, $data);
+            }else if(file_exists($callingScriptDirectory.'/'.$file.'.php')){
+                self::render($callingScriptDirectory.'/'.$file.'.php', $data);
+            }else if(file_exists(SS_PATH.$file)){
+                self::render($file, $data);
+            }else if(file_exists(SS_PATH.$file.'.php')){
+                self::render(SS_PATH.$file.'.php', $data);
+            }else{
+                Debugger::report(404, true);
+            }
+        }
+    }
 
-			if(file_exists($callingScriptDirectory.'/'.$file)){
-				self::render($callingScriptDirectory.'/'.$file, $data);
-			}else if(file_exists($callingScriptDirectory.'/'.$file.'.php')){
-				self::render($callingScriptDirectory.'/'.$file.'.php', $data);
-			}else if(file_exists(SS_PATH.$file)){
-				self::render($file, $data);
-			}else if(file_exists(SS_PATH.$file.'.php')){
-				self::render(SS_PATH.$file.'.php', $data);
-			}else{
-				Debugger::report(404, true);
-			}
-		}
-	}
+    /**
+     * Renders a template file. Inject dependencies from the Application
+     * Container and the Core\Sharer before viewing the file. Also,
+     * extracts &$data into variables usable from the template files
+     *
+     * @param string	$file		file name / path to the file
+     *
+     * @static
+     * @access private
+     * @since Method available since Release 0.1.0
+     */
+    static private function render($file, $data){
+        extract($data);
+        // Extract data retreived from the Sharer
+        if(Sharer::get() !== null){
+            extract(Sharer::get());
+        }
+        self::$hive = array_merge(self::$hive, get_defined_vars());
+        unset($data);
 
-	/**
-	 * Renders a template file. Inject dependencies from the Application
-	 * Container and the Core\Sharer before viewing the file. Also,
-	 * extracts &$data into variables usable from the template files
-	 *
-	 * @param string	$file		file name / path to the file
-	 * @param array		&$data	array of data or objects
- 	 *
-	 * @static
-	 * @access private
-	 * @since Method available since Release 0.1.0
-	 */
-	static private function render($file, &$data = []){
-		// Extract the variable $data passed to the Core\Viewer::file()
-		extract ($data);
-
-		// We don't want duplicated data
-		unset($data);
-
-		// Extract data retreived from the Sharer
-		if(Sharer::get() !== null){
-			extract(Sharer::get());
-		}
-
-		// Get all defined vars into $hive, which is used in callback method replace
-        self::$hive = get_defined_vars();
-
-		ob_start();
-		include($file);
-		$input = ob_get_contents();
-		ob_end_clean();
+        ob_start();
+        include($file);
+        $input = ob_get_contents();
+        ob_end_clean();
 
         $output = preg_replace_callback('!\{\{(\w+)\}\}!', 'Viewer::replace', $input);
 
         echo($output);
-	}
+    }
 
     static private function replace($matches) {
-	    if(isset(self::$hive[$matches[1]])){
-	        return self::$hive[$matches[1]];
+        if(isset(self::$hive[$matches[1]])){
+            return self::$hive[$matches[1]];
         }
     }
 

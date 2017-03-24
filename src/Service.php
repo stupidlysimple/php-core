@@ -74,7 +74,7 @@ class Service extends Service\ServiceContainer {
         }
 
         foreach($this->config as $className => $varName){
-           $this->$varName = new $className;
+            $this->$varName = new $className;
         }
     }
 }
