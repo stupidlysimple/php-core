@@ -41,6 +41,8 @@ namespace Core;
  */
 class Viewer {
 
+    // the hive is where all data is stored, which is then usable from all template
+    // files
     private static $hive = [];
 
     /**
@@ -97,6 +99,8 @@ class Viewer {
         if(Sharer::get() !== null){
             extract(Sharer::get());
         }
+
+        // Merge data into the hive
         self::$hive = array_merge(self::$hive, get_defined_vars());
         unset($data);
 
@@ -112,21 +116,27 @@ class Viewer {
     }
 
     static private function replace($matches) {
-        // !TODO if '.' is found in the string, assume it is an object
-        // and return the property of the object
+        // If '.' is found in the $matches[1], assume it is an object
+        // which have a property
 
-        // else, return the value of the variable
+        // else, assume it is a variable
         if (strpos($matches[1], '.') !== false) {
+            // explode the part before and after '.'
+            // the part before '.' is an object, while the part after '.' is a property
             list($object, $property) = explode('.', $matches[1]);
 
-            // if a '()' is found in $property, change it to callable
+            // if a '()' is found in $property, we will then assume it to be a callable
+            // method.
             if (strpos($property, '()') !== false) {
+                // remove paranthesis
                 list($function, $parenthesis) = explode('()', $property);
+
+                // return the callable method of the object from the hive
                 return(self::$hive[$object]->$function());
             }else{
+                // return the property of the object from the hive
                 return(self::$hive[$object]->$property);
             }
-
         }else{
             if(isset(self::$hive[$matches[1]])){
                 return self::$hive[$matches[1]];
