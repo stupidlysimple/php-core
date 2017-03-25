@@ -105,15 +105,34 @@ class Viewer {
         $input = ob_get_contents();
         ob_end_clean();
 
-        $output = preg_replace_callback('!\{\{(\w+)\}\}!', 'Viewer::replace', $input);
+        $output = preg_replace_callback('!\{\{(.*?)\}\}!', 'Viewer::replace', $input);
+
 
         echo($output);
     }
 
     static private function replace($matches) {
-        if(isset(self::$hive[$matches[1]])){
-            return self::$hive[$matches[1]];
+        // !TODO if '.' is found in the string, assume it is an object
+        // and return the property of the object
+
+        // else, return the value of the variable
+        if (strpos($matches[1], '.') !== false) {
+            list($object, $property) = explode('.', $matches[1]);
+
+            // if a '()' is found in $property, change it to callable
+            if (strpos($property, '()') !== false) {
+                list($function, $parenthesis) = explode('()', $property);
+                return(self::$hive[$object]->$function());
+            }else{
+                return(self::$hive[$object]->$property);
+            }
+
+        }else{
+            if(isset(self::$hive[$matches[1]])){
+                return self::$hive[$matches[1]];
+            }
         }
+
     }
 
 }
