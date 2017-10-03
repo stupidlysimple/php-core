@@ -41,8 +41,10 @@ namespace Core;
  */
 class Viewer {
 
-    // the hive is where all data is stored, which is then usable from all template
-    // files
+    /**
+     * the hive is where all data is stored, which is then usable from all template
+     * files
+     */
     private static $hive = [];
 
     /**
@@ -57,26 +59,40 @@ class Viewer {
      * @see Viewer::render()
      * @since Method available since Release 0.1.0
      */
-    static function file($file, array $data = []){
+    public static function file($file, array $data = []) {
         // Do you love displaying blank pages?
-        if($file === 'index' || $file === 'index.php'){
+        if ($file === 'index' || $file === 'index.php') {
             Debugger::report(404, true);
-        }else{
+        } else {
             /**
              * Get the path of the calling script and get it's containing Directory
              * to enable include() style of accessing files
              */
-            $callingScriptPath = debug_backtrace()[0]['file'];
-            $callingScriptDirectory = realpath(dirname($callingScriptPath));
-            if(file_exists($callingScriptDirectory.'/'.$file)){
-                self::render($callingScriptDirectory.'/'.$file, $data);
-            }else if(file_exists($callingScriptDirectory.'/'.$file.'.php')){
-                self::render($callingScriptDirectory.'/'.$file.'.php', $data);
-            }else if(file_exists(SS_PATH.$file)){
-                self::render($file, $data);
-            }else if(file_exists(SS_PATH.$file.'.php')){
-                self::render(SS_PATH.$file.'.php', $data);
-            }else{
+            $calling_script_path = debug_backtrace()[0]['file'];
+            $calling_script_directory = realpath(dirname($calling_script_path));
+
+            /**
+             * Check if file exists, try directories
+             * 1. in the same directory as the calling script
+             * 2. same as #1 but without .tpl.php
+             * 3. Check in resources/views directory
+             * 4. same as #3 but without .tpl.php
+             * 5. check on the root directory
+             * 6. same #5 but without .tpl.php
+             */
+            if (file_exists($render_path = $calling_script_directory.'/'.$file.'.tpl.php')) {
+                self::render($render_path, $data);
+            } elseif (file_exists($render_path = $calling_script_directory.'/'.$file)) {
+                self::render($render_path, $data);
+            } elseif(file_exists($render_path = SS_PATH.'/resources/views/'.$file.'.tpl.php')) {
+                self::render($render_path, $data);
+            }  elseif(file_exists($render_path = SS_PATH.'/resources/views/'.$file)) {
+                self::render($render_path, $data);
+            } elseif(file_exists($render_path = SS_PATH.'/'.$file.'.tpl.php')) {
+                self::render($render_path, $data);
+            } elseif(file_exists($render_path = SS_PATH.'/'.$file)) {
+                self::render($render_path, $data);
+            } else {
                 Debugger::report(404, true);
             }
         }
@@ -85,64 +101,88 @@ class Viewer {
     /**
      * Renders a template file. Inject dependencies from the Application
      * Container and the Core\Sharer before viewing the file. Also,
-     * extracts &$data into variables usable from the template files
+     * extracts $data into variables usable from the template files
+     *
+     * The template file will be echoed in the scope of this static
+     * private method.
      *
      * @param string	$file		file name / path to the file
      *
      * @static
      * @access private
      * @since Method available since Release 0.1.0
+     *
      */
-    static private function render($file, $data){
+    private static function render($file, $data)
+    {
+        // Extract data passed by the user
         extract($data);
-        // Extract data retreived from the Sharer
-        if(Sharer::get() !== null){
+
+        // Extract data from the Sharer
+        if (Sharer::get() !== null) {
             extract(Sharer::get());
         }
 
         // Merge data into the hive
         self::$hive = array_merge(self::$hive, get_defined_vars());
+
+        // Unset data since we have extracted it
         unset($data);
 
+        // Capture all contents of the template file into string $input
         ob_start();
         include($file);
         $input = ob_get_contents();
         ob_end_clean();
 
+        // Replace all {{ }} with values
         $output = preg_replace_callback('!\{\{(.*?)\}\}!', 'Viewer::replace', $input);
 
-
+        // Display final output of the template file
         echo($output);
     }
 
-    static private function replace($matches) {
+    /**
+     * Replace {{ }} with values
+     *
+     * @static
+     * @access private
+     * @param $matches
+     * @since Method available since Release 0.5
+     * @return mixed
+     */
+    private static function replace($matches)
+    {
         // If '.' is found in the $matches[1], assume it is an object
-        // which have a property
-
-        // else, assume it is a variable
+        // which have a property.
         if (strpos($matches[1], '.') !== false) {
-            // explode the part before and after '.'
+            // Explode the part before and after '.'
             // the part before '.' is an object, while the part after '.' is a property
             list($object, $property) = explode('.', $matches[1]);
 
-            // if a '()' is found in $property, we will then assume it to be a callable
+            // If a '()' is found in $property, we will then assume it to be a callable
             // method.
             if (strpos($property, '()') !== false) {
-                // remove paranthesis
+                // Remove paranthesis
                 list($function, $parenthesis) = explode('()', $property);
 
-                // return the callable method of the object from the hive
+                // Execute the method and return the value given by the method
                 return(self::$hive[$object]->$function());
-            }else{
-                // return the property of the object from the hive
+            } else {
+                // Return the property of the object from the hive
                 return(self::$hive[$object]->$property);
             }
-        }else{
-            if(isset(self::$hive[$matches[1]])){
+        } else {
+            if (strpos($matches[1], '()') !== false) {
+                // Remove paranthesis
+                list($function, $parenthesis) = explode('()', $matches[1]);
+
+                // Execute function and return the value given by the function
+                return self::$hive[$function]();
+            }elseif(isset(self::$hive[$matches[1]])){
                 return self::$hive[$matches[1]];
             }
         }
-
     }
 
 }

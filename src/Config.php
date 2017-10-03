@@ -78,7 +78,7 @@ class Config {
 	 */
 	public static function get($file, $key = null){
 		if(isset(self::$hive[$file]) === false){
-			self::$hive[$file] = include_once(SS_PATH.'config/'.$file.'.php');
+			self::$hive[$file] = include_once(SS_PATH.'/config/'.$file.'.php');
 		}
 
 		if($key === null){
@@ -99,7 +99,7 @@ class Config {
 	 */
 	public static function setEnv(){
 		if(self::$env === null){
-			self::$env = require_once(SS_PATH.'config/env.php');
+			self::$env = require_once(SS_PATH.'/config/env.php');
 		}
 
 		foreach(self::$env as $v => $a){
