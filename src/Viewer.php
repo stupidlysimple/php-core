@@ -73,7 +73,7 @@ class Viewer {
             }else if(file_exists($callingScriptDirectory.'/'.$file.'.php')){
                 self::render($callingScriptDirectory.'/'.$file.'.php', $data);
             }else if(file_exists(SS_PATH.$file)){
-                self::render($file, $data);
+                self::render(SS_PATH.$file, $data);
             }else if(file_exists(SS_PATH.$file.'.php')){
                 self::render(SS_PATH.$file.'.php', $data);
             }else{
